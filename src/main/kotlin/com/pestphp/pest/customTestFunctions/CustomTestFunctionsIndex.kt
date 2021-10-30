@@ -40,11 +40,11 @@ class CustomTestFunctionsIndex : FileBasedIndexExtension<String, List<Method>>()
                 return@DataIndexer mapOf()
             }
 
-            val customExpectations = file
-                .customExpects
-                .mapNotNull {
-                it.toMethod()
-            }
+            val customTestFunctions = file
+                .customTestFunctions
+                .map {
+                    it.toMethod()
+                }
 
 //            val publisher = file.project.messageBus.syncPublisher(CustomExpectationNotifier.TOPIC)
 //            publisher.changedExpectation(
@@ -53,7 +53,7 @@ class CustomTestFunctionsIndex : FileBasedIndexExtension<String, List<Method>>()
 //            )
 
             mapOf(
-                file.realPath to customExpectations
+                file.realPath to customTestFunctions
             )
         }
     }

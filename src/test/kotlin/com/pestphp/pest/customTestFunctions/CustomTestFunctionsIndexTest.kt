@@ -12,13 +12,9 @@ class CustomTestFunctionsIndexTest : PestLightCodeFixture() {
         return "src/test/resources/com/pestphp/pest/customTestFunctions"
     }
 
-    fun testCustomExpectationIsIndexed() {
+    fun testCustomTestFunctionsAreIndexed() {
         val virtualFile = myFixture.copyFileToProject("CustomTestFunction.php")
         val file = PsiManager.getInstance(project).findFile(virtualFile)!!
-
-        var wow = file.customTestFunctions
-
-        return
 
         val fileBasedIndex = FileBasedIndex.getInstance()
 
@@ -30,8 +26,8 @@ class CustomTestFunctionsIndexTest : PestLightCodeFixture() {
 
         assertSize(1, values)
         assertEquals(
-            values,
-            file.customExpects.map { it.toMethod() }
+            values.map { it.name },
+            file.customTestFunctions.map { it.name }
         )
     }
 }

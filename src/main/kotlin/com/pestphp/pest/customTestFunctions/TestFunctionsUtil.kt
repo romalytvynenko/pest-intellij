@@ -4,9 +4,15 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.descendantsOfType
 import com.jetbrains.php.lang.psi.PhpFile
+import com.jetbrains.php.lang.psi.elements.Function
+import com.jetbrains.php.lang.psi.elements.PhpExpression
 import com.jetbrains.php.lang.psi.elements.PhpNamespace
 import com.jetbrains.php.lang.psi.elements.impl.FunctionImpl
 import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl
+import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
+import com.pestphp.pest.customExpectations.generators.Method
+import com.pestphp.pest.customExpectations.generators.Parameter
+import com.pestphp.pest.extendName
 import com.pestphp.pest.isPestTestReference
 
 fun PsiElement.isPestCustomTestFunction(): Boolean {
@@ -35,3 +41,17 @@ val PsiFile.customTestFunctions: List<FunctionImpl>
                 .filterIsInstance<FunctionImpl>()
                 .filter { it.isPestCustomTestFunction() }
     }
+
+fun FunctionImpl.toMethod(): Method {
+    return Method(
+            this.name,
+            this.type,
+            this.parameters.map { parameter ->
+                Parameter(
+                        parameter.name,
+                        parameter.type,
+                        parameter.defaultValuePresentation
+                )
+            },
+    );
+}
