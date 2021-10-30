@@ -1,5 +1,6 @@
 package com.pestphp.pest.pestUtil
 
+import com.intellij.psi.util.elementType
 import com.pestphp.pest.PestLightCodeFixture
 import com.pestphp.pest.isPestTestReference
 
@@ -52,6 +53,15 @@ class IsPestTestFunctionTest : PestLightCodeFixture() {
         val file = myFixture.configureByFile("MethodCallNamedItAndVariableTest.php")
 
         val testElement = file.firstChild.lastChild.firstChild
+
+        assertFalse(testElement.isPestTestReference())
+    }
+
+    fun testFunctionCallWithTestInDefinitionIsPestTest() {
+        val file = myFixture.configureByFile("FunctionCallWithTestInDefinitionTest.php")
+
+        val testElement = file.firstChild.lastChild.firstChild
+        val type = testElement.elementType.toString()
 
         assertFalse(testElement.isPestTestReference())
     }
