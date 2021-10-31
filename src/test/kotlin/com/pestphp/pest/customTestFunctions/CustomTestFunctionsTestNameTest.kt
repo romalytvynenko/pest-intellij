@@ -27,6 +27,14 @@ class CustomTestFunctionsTestNameTest : PestLightCodeFixture() {
         assertEquals(":expected is correct", fn.customFunctionTestTestnamePattern)
     }
 
+    fun testFunctionWithMultipleStringConcatenationGivesCorrectTestNamePattern() {
+        val file = myFixture.configureByFile("CustomTestFunctionWithMultipleStringConcatenation.php")
+
+        val fn = PsiTreeUtil.findChildrenOfType(file, FunctionImpl::class.java).first()
+
+        assertEquals(":expected is correct :wow", fn.customFunctionTestTestnamePattern)
+    }
+
     fun testFunctionWithCurlyStringBracketsGivesCorrectTestNamePattern() {
         val file = myFixture.configureByFile("CustomTestFunctionWithCurlyStringBrackets.php")
 
