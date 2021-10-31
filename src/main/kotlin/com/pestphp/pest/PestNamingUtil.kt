@@ -9,15 +9,26 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl
 import com.jetbrains.php.run.remote.PhpRemoteInterpreterManager
 import com.jetbrains.php.util.pathmapper.PhpPathMapper
+import com.pestphp.pest.customTestFunctions.getPestCustomFunctionTestName
+import com.pestphp.pest.customTestFunctions.isPestCustomTestFunctionReference
 import java.util.Locale
 
 fun FunctionReferenceImpl.getPestTestName(): String? {
     val testName = (getParameter(0) as? StringLiteralExpression)?.contents
 
+    if (this.canonicalText == "test") {
+        return testName
+    }
+
     if (this.canonicalText == "it") {
         return "it $testName"
     }
-    return testName
+
+    if (this.isPestCustomTestFunctionReference()) {
+        return this.getPestCustomFunctionTestName(parameters)
+    }
+
+    return null
 }
 
 fun PsiElement?.getPestTestName(): String? {

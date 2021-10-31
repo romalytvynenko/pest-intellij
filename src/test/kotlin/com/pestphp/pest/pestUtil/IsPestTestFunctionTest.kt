@@ -61,7 +61,6 @@ class IsPestTestFunctionTest : PestLightCodeFixture() {
         val file = myFixture.configureByFile("FunctionCallWithTestInDefinitionTest.php")
 
         val testElement = file.firstChild.lastChild.firstChild
-        val type = testElement.elementType.toString()
 
         assertFalse(testElement.isPestTestReference())
     }

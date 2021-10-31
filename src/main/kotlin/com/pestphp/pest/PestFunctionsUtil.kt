@@ -8,13 +8,13 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpNamespace
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl
-import com.pestphp.pest.customTestFunctions.isPestCustomTestFunction
+import com.pestphp.pest.customTestFunctions.isPestCustomTestFunctionReference
 
 fun PsiElement?.isPestTestReference(): Boolean {
     return when (this) {
         null -> false
         is MethodReference -> this.isPestTestMethodReference()
-        is FunctionReferenceImpl -> this.isPestTestFunction()// || this.isPestCustomTestFunctionReference()
+        is FunctionReferenceImpl -> this.isPestTestFunction() || this.isPestCustomTestFunctionReference()
         else -> false
     }
 }

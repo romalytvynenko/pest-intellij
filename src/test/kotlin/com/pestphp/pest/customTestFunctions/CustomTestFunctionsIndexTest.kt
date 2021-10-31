@@ -18,15 +18,14 @@ class CustomTestFunctionsIndexTest : PestLightCodeFixture() {
 
         val fileBasedIndex = FileBasedIndex.getInstance()
 
-        val values = fileBasedIndex.getValues(
+        val values = fileBasedIndex.getAllKeys(
             CustomTestFunctionsIndex.key,
-            "/src/CustomTestFunction.php",
-            GlobalSearchScope.projectScope(project)
-        ).flatten()
+            project
+        )
 
         assertSize(1, values)
         assertEquals(
-            values.map { it.name },
+            values.toList(),
             file.customTestFunctions.map { it.name }
         )
     }

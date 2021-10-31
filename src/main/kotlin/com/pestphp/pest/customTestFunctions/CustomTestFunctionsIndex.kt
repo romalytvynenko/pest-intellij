@@ -12,19 +12,14 @@ import com.intellij.util.io.EnumeratorStringDescriptor
 import com.intellij.util.io.KeyDescriptor
 import com.jetbrains.php.lang.PhpFileType
 import com.jetbrains.php.lang.psi.PhpFile
-import com.pestphp.pest.customExpectations.externalizers.ListDataExternalizer
-import com.pestphp.pest.customExpectations.externalizers.MethodDataExternalizer
-import com.pestphp.pest.customExpects
-import com.pestphp.pest.customExpectations.generators.Method
-import com.pestphp.pest.realPath
-import com.pestphp.pest.toMethod
+import gnu.trove.THashMap
 
-class CustomTestFunctionsIndex : FileBasedIndexExtension<String, List<Method>>() {
+class CustomTestFunctionsIndex : FileBasedIndexExtension<String, MethodTestnamePair>() {
     companion object {
-        val key = ID.create<String, List<Method>>("php.pest.custom_test_functions")
+        val key = ID.create<String, MethodTestnamePair>("php.pest.custom_test_functions")
     }
 
-    override fun getName(): ID<String, List<Method>> {
+    override fun getName(): ID<String, MethodTestnamePair> {
         return key
     }
 
@@ -32,7 +27,7 @@ class CustomTestFunctionsIndex : FileBasedIndexExtension<String, List<Method>>()
         return 2
     }
 
-    override fun getIndexer(): DataIndexer<String, List<Method>, FileContent> {
+    override fun getIndexer(): DataIndexer<String, MethodTestnamePair, FileContent> {
         return DataIndexer { inputData ->
             val file = inputData.psiFile
 
@@ -41,20 +36,15 @@ class CustomTestFunctionsIndex : FileBasedIndexExtension<String, List<Method>>()
             }
 
             val customTestFunctions = file
-                .customTestFunctions
-                .map {
-                    it.toMethod()
-                }
+                    .customTestFunctions
+                    .filter { it.customFunctionTestTestnamePattern != null }
+                    .map { Pair(it.toMethod(), it.customFunctionTestTestnamePattern as String) }
 
-//            val publisher = file.project.messageBus.syncPublisher(CustomExpectationNotifier.TOPIC)
-//            publisher.changedExpectation(
-//                file,
-//                customExpectations
-//            )
-
-            mapOf(
-                file.realPath to customTestFunctions
-            )
+            val map = THashMap<String, MethodTestnamePair>()
+            for((method, testname) in customTestFunctions) {
+                map[method.name] = Pair(method, testname)
+            }
+            return@DataIndexer map
         }
     }
 
@@ -62,8 +52,8 @@ class CustomTestFunctionsIndex : FileBasedIndexExtension<String, List<Method>>()
         return EnumeratorStringDescriptor.INSTANCE
     }
 
-    override fun getValueExternalizer(): DataExternalizer<List<Method>> {
-        return ListDataExternalizer(MethodDataExternalizer.INSTANCE)
+    override fun getValueExternalizer(): DataExternalizer<MethodTestnamePair> {
+        return MethodTestnamePairExternalizer.INSTANCE
     }
 
     override fun getInputFilter(): FileBasedIndex.InputFilter {
