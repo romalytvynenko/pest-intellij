@@ -5,6 +5,7 @@ import com.intellij.remote.RemoteSdkProperties
 import com.jetbrains.php.config.interpreters.PhpInterpretersManagerImpl
 import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
+import com.jetbrains.php.lang.psi.elements.ParameterList
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl
 import com.jetbrains.php.run.remote.PhpRemoteInterpreterManager
@@ -25,7 +26,7 @@ fun FunctionReferenceImpl.getPestTestName(): String? {
     }
 
     if (this.isPestCustomTestFunctionReference()) {
-        return this.getPestCustomFunctionTestName(parameters)
+        return this.getPestCustomFunctionTestName(parameterList)
     }
 
     return null

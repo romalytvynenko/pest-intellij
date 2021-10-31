@@ -42,4 +42,12 @@ class CustomTestFunctionsTestNameTest : PestLightCodeFixture() {
 
         assertEquals(":expected is correct", fn.customFunctionTestTestnamePattern)
     }
+
+    fun testCustomTestFunctionGivesCorrectTestName() {
+        val file = myFixture.configureByFile("CustomTestFunctionUsage.php")
+
+        val call = PsiTreeUtil.findChildrenOfType(file, FunctionReferenceImpl::class.java).last()
+
+        assertEquals("some is correct", call.getPestTestName())
+    }
 }

@@ -1,5 +1,6 @@
 package com.pestphp.pest.customTestFunctions
 
+import com.intellij.microservices.url.parameters.a
 import com.intellij.patterns.StringPattern
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -8,10 +9,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.descendantsOfType
 import com.intellij.util.indexing.FileBasedIndex
 import com.jetbrains.php.lang.psi.PhpFile
+import com.jetbrains.php.lang.psi.elements.*
 import com.jetbrains.php.lang.psi.elements.Function
-import com.jetbrains.php.lang.psi.elements.MethodReference
-import com.jetbrains.php.lang.psi.elements.PhpExpression
-import com.jetbrains.php.lang.psi.elements.PhpNamespace
 import com.jetbrains.php.lang.psi.elements.impl.*
 import com.jetbrains.rd.util.string.printToString
 import com.pestphp.pest.customExpectations.generators.Method
@@ -142,20 +141,49 @@ fun PsiElement.isPestCustomTestFunctionReference(): Boolean {
     return values.count() != 0
 }
 
-fun PsiElement.getPestCustomFunctionTestName(parameters: Array<PsiElement>): String? {
+fun PsiElement.getPestCustomFunctionTestName(parametersList: ParameterList?): String? {
     if (this !is FunctionReferenceImpl) {
         return null
     }
 
     val index = FileBasedIndex.getInstance()
 
-    val values = index
+    val (method, testNamePattern) = index
             .getValues(
                     CustomTestFunctionsIndex.key,
                     this.canonicalText,
                     GlobalSearchScope.projectScope(this.project)
-            );
+            )[0] ?: return null
 
-    return ""
+    if (parametersList == null) {
+        return testNamePattern
+    }
+
+    val parametersValues = parametersList.parameters
+
+    var pattern = testNamePattern
+
+    // [fn-parameter-name => parameter-value]
+    val namedParamsMap = parametersValues
+            .withIndex()
+            .associate { (index, param) ->
+                val argumentIdentifier = ParameterListImpl.getNameIdentifier(param)
+
+                val argumentName = if (argumentIdentifier != null)
+                    argumentIdentifier.text
+                    else method.parameters[index]?.name
+
+                if (argumentName == null) {
+                    throw Exception("Cannot figure out parameter name")
+                }
+
+                Pair(argumentName, (param as StringLiteralExpressionImpl)?.contents)
+            }
+
+    for ((key, value) in namedParamsMap) {
+        pattern = pattern.replace(":".plus(key), value)
+    }
+
+    return pattern
 }
 
